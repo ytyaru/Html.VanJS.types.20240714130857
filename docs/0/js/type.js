@@ -38,9 +38,12 @@ class Type {
         this._names.set('Class', [['Cls'], (v)=>{
             if (this.isNullOrUndefined(v)) return false
             if (this.isPrimitive(v)) return false
-            if (this.isFunction(v)) return false
+            //if (this.isFunction(v)) return false
             if ('Object'===v.constructor.name) return false
             if ('Function'!==v.constructor.name) return false
+//            if ('AsyncFunction'!==v.constructor.name) return false
+//            if ('GeneratorFunction'!==v.constructor.name) return false
+//            if ('AsyncGeneratorFunction'!==v.constructor.name) return false
             return true
         }])
         this._names.set('ErrorClass', [['ErrCls'], (v)=>Error.isPrototypeOf(v)]) // Error.isPrototypeOf(TypeError)
@@ -58,6 +61,7 @@ class Type {
             if (this.isNullOrUndefined(v)) { return false }
             return 'function'===typeof v[Symbol.iterator]
         }])
+        //this._names.set('Function', [['Func', 'Fn'], (v)=>'function'===typeof v])
         this._names.set('Function', [['Func', 'Fn'], (v)=>'function'===typeof v])
         this._names.set('SyncFunction', [['SyncFn', 'SFn'], (v)=>this.isFn(v) && !this.isAFn(v) && !this.isGFn(v) && !this.isAGFn(v)])
         this._names.set('AsyncFunction', [['AsyncFunc', 'AsyncFn', 'AFn'], (v)=>v instanceof this._types.AsyncFunction])

@@ -11,6 +11,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     const a = new Assertion()
     class C {}
+//    console.log(C.constructor.name)
+//    console.log(Type.isClass(C))
+
+
+
     const datas = {
         'Undefined': undefined,
         'Null': null,
@@ -52,98 +57,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
 //            expected = (nums.some(t=>t===k) && nums.some(t=>t===K)) ? true : expected
             try {
                 console.log(`Type.is${K}(${k}: ${v})`)
-                // Number
-                //   Integer
-                //     Positive
-                //     Negative
-                //   Float
-                // 偽であるべき所が真です。
-                // Type.isInteger(Number: 1)
-                // Type.isPositiveInteger(Number: 1)
-                // Type.isNumber(Integer: 2)
-                // Type.isPositiveInteger(Integer: 2)
-                // Type.isNumber(PositiveInteger: 3)
-                // Type.isInteger(PositiveInteger: 3)
-                // Type.isNumber(NegativeInteger: -1)
-                // Type.isInteger(NegativeInteger: -1)
-                // Type.isNumber(Float: 1.1)
-                // Type.isIterator(String: A)
-                // Type.isInstance(Array: 1,A)
-                // Type.isIterator(Array: 1,A)
-                // Type.isFunction(Class: class C {})
-                // Type.isFunction(ErrorClass: function Error() { [native code] })
-                // Type.isInstance(ErrorInstance: Error)
-                // Type.isInstance(Promise: [object Promise])
-                // Type.isArray(Iterator: 1,A)
-                // Type.isInstance(Iterator: 1,A)
-                // Type.isFunction(AsyncFunction: async()=>{})
-                // Type.isFunction(GeneratorFunction: function*(){yield undefined;})
-                // Type.isFunction(AsyncGeneratorFunction: function AsyncGeneratorFunction() { [native code] })
-                // Type.isInstance(Date: Wed Jul 17 2024 18:37:28 GMT+0900 (日本標準時))
-                // Type.isInstance(RegExp: /(?:)/)
-                // Type.isInstance(URL: https://a.com/)
-                // Type.isMap(URL: https://a.com/)
-                // Type.isSet(URL: https://a.com/)
-                // Type.isInstance(Map: [object Map])
-                // Type.isIterator(Map: [object Map])
-                // Type.isInstance(Set: [object Set])
-                // Type.isIterator(Set: [object Set])
-                // Type.isInstance(Element: [object HTMLDivElement])
-                // 
-                // 
-                // 
-                // 
-                // 
-
-
-
-
-
-                // 真であるべき所が偽です。
-                // Type.isClass(Class: class C {})
-                // Type.isErrorClass(ErrorClass: function Error() { [native code] })
-                // Type.isAsyncGeneratorFunction(AsyncGeneratorFunction: function AsyncGeneratorFunction() { [native code] })
-                // Type.isMap(Map: [object Map])
-                // Type.isSet(Set: [object Set])
-                // 
-                // 
-                // 
-                // 
-                // 
-                // 
-                // 
-
-                // 引数は真偽値かそれを返す関数であるべきです。
-                // Type.isDate(Array: 1,A)
-                // Type.isDate(Object: [object Object])
-                // Type.isDate(Class: class C {})
-                // Type.isDate(Instance: [object Object])
-                // Type.isDate(ErrorClass: function Error() { [native code] })
-                // Type.isDate(ErrorInstance: Error)
-                // Type.isDate(Promise: [object Promise])
-                // Type.isDate(Iterator: 1,A)
-                // Type.isDate(Function: ()=>{})
-                // Type.isDate(AsyncFunction: async()=>{})
-                // Type.isDate(GeneratorFunction: function*(){yield undefined;})
-                // Type.isDate(AsyncGeneratorFunction: function AsyncGeneratorFunction() { [native code] })
-                // Type.isDate(RegExp: /(?:)/)
-                // Type.isDate(URL: https://a.com/)
-                // Type.isDate(Map: [object Map])
-                // Type.isDate(Set: [object Set])
-                // Type.isDate(Element: [object HTMLDivElement])
-                // 
-                // 
-                // 
-                // 
-                // 
-                // 
-                // 
-                // 
-                // 
-                // 
-
-                // TypeError: Cannot convert a Symbol value to a string
-                // Type.isElement(String: A)
                 if (expected) { a.t(Type[`is${K}`](v)) }
                 else { a.f(Type[`is${K}`](v)) }
             } catch (err) {
@@ -151,6 +64,103 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
     }
+    /*
+    */
+
+    // Number
+    //   Integer
+    //     Positive
+    //     Negative
+    //   Float
+    // 偽であるべき所が真です。
+    // Type.isInteger(Number: 1)
+    // Type.isPositiveInteger(Number: 1)
+    // Type.isNumber(Integer: 2)
+    // Type.isPositiveInteger(Integer: 2)
+    // Type.isNumber(PositiveInteger: 3)
+    // Type.isInteger(PositiveInteger: 3)
+    // Type.isNumber(NegativeInteger: -1)
+    // Type.isInteger(NegativeInteger: -1)
+    // Type.isNumber(Float: 1.1)
+    // Type.isIterator(String: A)
+    // Type.isInstance(Array: 1,A)
+    // Type.isIterator(Array: 1,A)
+    // Type.isFunction(Class: class C {})
+    // Type.isFunction(ErrorClass: function Error() { [native code] })
+    // Type.isInstance(ErrorInstance: Error)
+    // Type.isInstance(Promise: [object Promise])
+    // Type.isArray(Iterator: 1,A)
+    // Type.isInstance(Iterator: 1,A)
+    // Type.isFunction(AsyncFunction: async()=>{})
+    // Type.isFunction(GeneratorFunction: function*(){yield undefined;})
+    // Type.isFunction(AsyncGeneratorFunction: function AsyncGeneratorFunction() { [native code] })
+    // Type.isInstance(Date: Wed Jul 17 2024 18:37:28 GMT+0900 (日本標準時))
+    // Type.isInstance(RegExp: /(?:)/)
+    // Type.isInstance(URL: https://a.com/)
+    // Type.isMap(URL: https://a.com/)
+    // Type.isSet(URL: https://a.com/)
+    // Type.isInstance(Map: [object Map])
+    // Type.isIterator(Map: [object Map])
+    // Type.isInstance(Set: [object Set])
+    // Type.isIterator(Set: [object Set])
+    // Type.isInstance(Element: [object HTMLDivElement])
+    // 
+    // 
+    // 
+    // 
+    // 
+
+
+
+
+
+    // 真であるべき所が偽です。
+    // Type.isClass(Class: class C {})
+    // Type.isErrorClass(ErrorClass: function Error() { [native code] })
+    // Type.isAsyncGeneratorFunction(AsyncGeneratorFunction: function AsyncGeneratorFunction() { [native code] })
+    // Type.isMap(Map: [object Map])
+    // Type.isSet(Set: [object Set])
+    // 
+    // 
+    // 
+    // 
+    // 
+    // 
+    // 
+
+    // 引数は真偽値かそれを返す関数であるべきです。
+    // Type.isDate(Array: 1,A)
+    // Type.isDate(Object: [object Object])
+    // Type.isDate(Class: class C {})
+    // Type.isDate(Instance: [object Object])
+    // Type.isDate(ErrorClass: function Error() { [native code] })
+    // Type.isDate(ErrorInstance: Error)
+    // Type.isDate(Promise: [object Promise])
+    // Type.isDate(Iterator: 1,A)
+    // Type.isDate(Function: ()=>{})
+    // Type.isDate(AsyncFunction: async()=>{})
+    // Type.isDate(GeneratorFunction: function*(){yield undefined;})
+    // Type.isDate(AsyncGeneratorFunction: function AsyncGeneratorFunction() { [native code] })
+    // Type.isDate(RegExp: /(?:)/)
+    // Type.isDate(URL: https://a.com/)
+    // Type.isDate(Map: [object Map])
+    // Type.isDate(Set: [object Set])
+    // Type.isDate(Element: [object HTMLDivElement])
+    // 
+    // 
+    // 
+    // 
+    // 
+    // 
+    // 
+    // 
+    // 
+    // 
+
+    // TypeError: Cannot convert a Symbol value to a string
+    // Type.isElement(String: A)
+
+
     /*
     */
 //    const a = new Assertion()
