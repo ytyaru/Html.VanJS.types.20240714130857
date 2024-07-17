@@ -59,14 +59,20 @@ class Type {
             return 'function'===typeof v[Symbol.iterator]
         }])
         this._names.set('Function', [['Func', 'Fn'], (v)=>'function'===typeof v])
+        this._names.set('SyncFunction', [['SyncFn', 'SFn'], (v)=>this.isFn(v) && !this.isAFn(v) && !this.isGFn(v) && !this.isAGFn(v)])
         this._names.set('AsyncFunction', [['AsyncFunc', 'AsyncFn', 'AFn'], (v)=>v instanceof this._types.AsyncFunction])
         this._names.set('GeneratorFunction', [['GenFn', 'GFn'], (v)=>v instanceof this._types.GeneratorFunction])
+        this._names.set('SyncGeneratorFunction', [['SyncGenFn', 'SGFn'], (v)=>v instanceof this._types.GeneratorFunction && !(v instanceof this._types.AsyncGeneratorFunction)])
         this._names.set('AsyncGeneratorFunction', [['AsyncGenFn', 'AGFn'], (v)=>v instanceof this._types.AsyncGeneratorFunction])
 
         // https://stackoverflow.com/questions/643782/how-to-check-whether-an-object-is-a-date
-        this._names.set('Date', [['Dt','D'], (v)=>v && v.getMonth && typeof v.getMonth === 'function' && Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)])
+        //this._names.set('Date', [['Dt','D'], (v)=>v && v.getMonth && typeof v.getMonth === 'function' && Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)])
+        //this._names.set('Date', [['Dt','D'], (v)=>this.isPrimitive(v) ? false : v && v.getMonth && typeof v.getMonth === 'function' && Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)])
+        this._names.set('Date', [['Dt','D'], (v)=>this.isPrimitive(v) ? false : Boolean(v && v.getMonth && typeof v.getMonth === 'function' && Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v))])
         this._names.set('RegExp', [[], (v)=>v instanceof RegExp])
-
+        this._names.set('URL', [[], (v)=>v instanceof URL])
+        this._names.set('Map', [[], (v)=>v instanceof URL])
+        this._names.set('Set', [[], (v)=>v instanceof URL])
         this._names.set('Element', [['Elm', 'El', 'E'], (v)=>{
             try { return v instanceof HTMLElement; }
             catch(e){
@@ -79,7 +85,7 @@ class Type {
             const fnName = `is${k}`
             //const getter = this[fnName]
             const [abbrs, fn] = v
-            console.log(fnName, abbrs, fn)
+            //console.log(fnName, abbrs, fn)
             if ('function'!==typeof fn) { throw new Error(`${fnName}が未定義です。`)}
             this.#defineMain(fnName, fn) // 正式
             for (let name of abbrs) { this.#defineAbbr(`is${name}`, fn) } // 略名

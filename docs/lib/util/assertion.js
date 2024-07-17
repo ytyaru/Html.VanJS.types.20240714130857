@@ -163,10 +163,17 @@ class AssertError extends Error {
         this.status = status;
     }
 }
+class TestError extends Error {
+    constructor(msg, status, cause) {
+        super(msg, {cause,cause});
+        this.name = 'TestError';
+        this.cause = cause;
+        this.status = status;
+    }
+}
 class BaseAssertion {
-    constructor(M) { this._M = M; this._asyncs = []; this._asyncDict = {};}
+    constructor(M) { this._M = M; this._asyncs = []; }
     _console(status, msg, err, caller) { // status:pending/exception/fail/success、[s,m],[s,m,c],[s,m,e],[s,m,e,c]
-//        console.log(status, msg, err, caller)
         const stacks = (undefined===err || this.__isFn(err)) ? this._captureStacks(this._console) : this._getErrorStacks(err)
         if (['exception','fail'].some(s=>s===status)) {
             console.log(`%c${msg}\n${stacks.join('\n')}`, `background-color:${this._M.stt[status].color.b};color:${this._M.stt[status].color.f};`)
@@ -179,7 +186,6 @@ class BaseAssertion {
             Error.captureStackTrace(this, caller ?? this._captureStacks);
             const s = this.stack.split('\n')
             s.shift() // 先頭にある Error 削除
-            //return s
             return this.__delStacks(s)
         } else { return [] } 
     }
@@ -293,7 +299,6 @@ class BoolAssertion extends BaseAssertion {
         return ''
     }
     __nCheck(bool) {
-        console.log('nCheck')
         // テスト例外。テストコードは最後に真偽値を返してください。
         if (!this.__isBool(bool)) {
             this._count.exception++
@@ -412,22 +417,22 @@ class ExceptionAssertion extends BaseAssertion {
     __eCheckTypeMsg(type, err) {
 //        if (err instanceof type) { return '' }
         if (err.constructor.name === type.name) { return '' }
-//        return `型が違います。\n期待値: ${type.name}\n実際値: ${err.constructor.name}`
+        // `型が違います。\n期待値: ${type.name}\n実際値: ${err.constructor.name}`
         return this._M.msg.exception.runtime.type(type.name, err.constructor.name)
     }
     __eCheckMsgMsg(msg, err) {
         if (msg instanceof RegExp) {
             if (msg.test(msg)) { return '' }
-//            return `メッセージが違います。\n期待値: ${msg}\n実際値: ${err.message}`
+            // `メッセージが違います。\n期待値: ${msg}\n実際値: ${err.message}`
             return this._M.msg.exception.runtime.msg(msg, err.message)
         }
         if ('string'===typeof msg || msg instanceof String) {
             if (msg===err.message) { return '' }
-//            return `メッセージが違います。\n期待値: ${msg}\n実際値: ${err.message}`
+            // `メッセージが違います。\n期待値: ${msg}\n実際値: ${err.message}`
             return this._M.msg.exception.runtime.msg(msg, err.message)
         }
     }
-    //__errorMsg() { return `テスト失敗。例外発生すべき所で例外発生せず正常終了しました。` }
+    // テスト失敗。例外発生すべき所で例外発生せず正常終了しました。
     __errorMsg() { return this._M.msg.exception.runtime.noneException }
 }
 class Assertion {
@@ -459,7 +464,6 @@ class Assertion {
                         this._t._console(res.reason.status, this._M.msg.fin.exception.one, res.reason, this.fin)
                     }
                 }
-                console.log(results)
                 this._count.pending -= results.length
             })
             // 非同期テスト一括実行で例外発生しました。
