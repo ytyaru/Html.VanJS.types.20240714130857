@@ -27,8 +27,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     a.f(Type.isNUEvery(null,1))
     a.f(Type.isNUEvery(1,undefined))
     a.f(Type.isNUEvery(1,2))
-    a.f(Type.isPrimitive(null))
-    a.f(Type.isPrimitive(undefined))
+    a.t(Type.isPrimitive(null))
+    a.t(Type.isPrimitive(undefined))
     a.t(Type.isPrimitive(1))
     a.t(Type.isPrimitive(1.1))
     a.t(Type.isPrimitive('A'))
@@ -44,10 +44,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
     a.f(Type.isPrimitive(C))
     a.f(Type.isPrimitive(new C))
     a.f(Type.isPrimitive(new C()))
-    a.t(Type.isAfn(async()=>{}))
-    a.f(Type.isAfn(()=>{}))
-    const AFn = (async()=>{}).constructor
-    console.log(AFn.name)
+    a.f(Type.isPrimitive(Type._types.AsyncFunction))
+    a.f(Type.isPrimitive(Type._types.GeneratorFunction))
+    a.f(Type.isPrimitive(Type._types.AsyncGeneratorFunction))
+    a.f(Type.isPrimitive(new Promise((resolve)=>resolve())))
+    a.t(Type.isAFn(async()=>{}))
+    a.f(Type.isAFn(()=>{}))
+//    const AFn = (async()=>{}).constructor
+//    console.log(AFn.name)
+    a.fin()
 });
 window.addEventListener('beforeunload', (event) => {
     console.log('beforeunload!!');
