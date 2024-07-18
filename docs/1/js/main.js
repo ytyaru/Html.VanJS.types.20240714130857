@@ -65,7 +65,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 (K==='Integer' && k==='NegativeInteger') || // Type.isInteger(NegativeInteger: -1)
                 (K==='Number' && k==='Float') || // Type.isNumber(Float: 1.1)
                 (K==='Iterator' && k==='String') || // Type.isIterator(String: A)
-                (K==='Instance' && k==='Array') || // Type.isInstance(Array: 1,A)
+////                (K==='Instance' && k==='Array') || // Type.isInstance(Array: 1,A)
                 (K==='Iterator' && k==='Array') || // Type.isIterator(Array: 1,A)
 //                (K==='' && k==='') || // Type.isInstance(Class: class C {})
                 (K==='Class' && k==='ErrorClass') || // Type.isClass(ErrorClass: function Error() { [native code] })
@@ -80,11 +80,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 (K==='Instance' && k==='Date') || // Type.isInstance(Date: Thu Jul 18 2024 09:10:52 GMT+0900 (日本標準時))
                 (K==='Instance' && k==='RegExp') || // Type.isInstance(RegExp: /(?:)/)
                 (K==='Instance' && k==='URL') || // Type.isInstance(URL: https://a.com/)
-                (K==='Instance' && k==='Map') || // Type.isInstance(Map: [object Map])
+////                (K==='Instance' && k==='Map') || // Type.isInstance(Map: [object Map])
                 (K==='Iterator' && k==='Map') || // Type.isIterator(Map: [object Map])
-                (K==='Instance' && k==='Set') || // Type.isInstance(Set: [object Set])
+////                (K==='Instance' && k==='Set') || // Type.isInstance(Set: [object Set])
                 (K==='Iterator' && k==='Set') || // Type.isIterator(Set: [object Set])
                 (K==='Instance' && k==='Element') // Type.isInstance(Element: [object HTMLDivElement])
+//                (K==='Instance' && k==='Iterator') || // Type.isInstance(Iterator: 1,A)
                 ) { expected = true }
             try {
                 console.log(`Type.is${K}(${k}: ${v})`)
@@ -95,13 +96,27 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }
         }
     }
-
     // 意地悪テスト
     a.t(Type.isPrim(    String('A')))
     a.f(Type.isPrim(new String('A')))
 
+    a.t(Type.isObject({}))
+    a.f(Type.isObject(new String('A')))
+    a.t('object'===typeof new String('A'))
+    a.t('object'===typeof {})
+    a.t(Type.isString(new String('A')))
+    a.f(Type.isInstance(new String('A')))
+    a.t(Type.isIterator(new String('A')))
+
+    // 個別テスト
+    a.t(Type.isIter([]))
+    a.t(Type.isEmpty([]))
+    a.f(Type.isEmpty([1]))
+    a.f(Type.isIter({}))
+    a.e(TypeError, 'Not iterator.', ()=>Type.isEmpty({})) // Iterでないものは例外発生させる
     /*
     */
+    console.log(Type)
 
     // Number
     //   Integer

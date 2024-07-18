@@ -21,54 +21,23 @@ class Type {
         this._names.set('Float', [['Flt','F'], (v)=>this.isNumber(v) && (v % 1 !== 0 || 0===v)])
         this._names.set('String', [['Str', 'S'], (v)=>'string'===typeof v || v instanceof String])
         this._names.set('Symbol', [['Sym'], (v)=>'symbol'===typeof v])
-        //this._names.set('Primitive', [['Prim'], (v)=>(!this.isNU(v) && !this.isFn(v) && 'object'!==typeof v))])
-        //this._names.set('Primitive', [['Prim'], (v)=>'function,object'.split(',').every(x=>x!==typeof v)])
-        //this._names.set('ValidPrimitive', [['VPrim', 'Vp'], (v)=>'null,undefined,function,object'.split(',').every(x=>x!==typeof v))]) // null,undefinedを抜いたprimitive
         this._names.set('Primitive', [['Prim'], (v)=>v !== Object(v)])
-        this._names.set('ValidPrimitive', [['VPrim', 'Vp'], (v)=>this.isNullOrUndefined(v) ? false : this.isPrim(v)]) // null,undefinedを抜いたprimitive
-        this._names.set('Array', [['Ary', 'A'], (v)=>Array.isArray(v)])
-        // https://github.com/lodash/lodash/blob/master/isPlainObject.js
-        this._names.set('Object', [['Obj', 'O'], (v)=>{
-            if (!this.#isObjectLike(v) || this.#getTag(v) != '[object Object]') { return false }
-            if (Object.getPrototypeOf(v) === null) { return true }
-            let proto = v
-            while (Object.getPrototypeOf(proto) !== null) { proto = Object.getPrototypeOf(proto) }
-            return Object.getPrototypeOf(v) === proto
-        }])
+        this._names.set('ValidPrimitive', [['VPrim', 'VP'], (v)=>this.isNullOrUndefined(v) ? false : this.isPrim(v)]) // null,undefinedを抜いたprimitive
         this._names.set('Class', [['Cls','Constructor'], (v)=>{
             try { new v(); return true; }
             catch (err) { return false }
         }])
-        /*
-        this._names.set('Class', [['Cls'], (v)=>{
-            if (this.isNullOrUndefined(v)) return false
-            if (this.isPrimitive(v)) return false
-            //if (this.isFunction(v)) return false
-            if ('Object'===v.constructor.name) return false
-            if ('Function'!==v.constructor.name) return false
-//            if ('AsyncFunction'!==v.constructor.name) return false
-//            if ('GeneratorFunction'!==v.constructor.name) return false
-//            if ('AsyncGeneratorFunction'!==v.constructor.name) return false
-            return true
-        }])
-        */
-        this._names.set('ErrorClass', [['ErrCls'], (v)=>Error===v||Error.isPrototypeOf(v)]) // Error.isPrototypeOf(TypeError)
         this._names.set('Instance', [['Ins'], (v, c)=>{
-//            if (this.isNullOrUndefined(v)) return false
             if (this.isPrimitive(v)) return false
             if (this.isFunction(v)) return false
-            if ('Object'===v.constructor.name) return false   // Object
             if (this.isCls(v)) return false // Class
-            //if ('Function'===v.constructor.name) return false // Class
-            //if (this.isCls(v)) return false // Class
+            if (this.isObj(v)) return false   // Object
+            if (this.isItr(v)) return false   // Iterator
+            //if ('Object'===v.constructor.name) return false   // Object
             return this.isClass(c) ? c===i.constructor : true // cがあるときはそのクラスのインスタンスであるか確認する
         }])
-        this._names.set('ErrorInstance', [['ErrIns'], (v)=>v instanceof Error]) // new TypeError() instanceof Error
-        this._names.set('Promise', [['Prms', 'Prm'], (v)=>v instanceof Promise])
-        this._names.set('Iterator', [['Iter', 'Itr', 'It'], (v)=>{
-            if (this.isNullOrUndefined(v)) { return false }
-            return 'function'===typeof v[Symbol.iterator]
-        }])
+        this._names.set('ErrorClass', [['ErrCls'], (v)=>Error===v||Error.isPrototypeOf(v)]) // Error.isPrototypeOf(TypeError)
+        this._names.set('ErrorInstance', [['ErrIns','Error','Err'], (v)=>v instanceof Error]) // new TypeError() instanceof Error
         //this._names.set('Function', [['Func', 'Fn'], (v)=>'function'===typeof v])
         this._names.set('Function', [['Func', 'Fn'], (v)=>'function'===typeof v && !this.isCls(v)])
         this._names.set('SyncFunction', [['SyncFn', 'SFn'], (v)=>this.isFn(v) && !this.isAFn(v) && !this.isGFn(v) && !this.isAGFn(v)])
@@ -77,14 +46,42 @@ class Type {
         this._names.set('SyncGeneratorFunction', [['SyncGenFn', 'SGFn'], (v)=>v instanceof this._types.GeneratorFunction && !(v instanceof this._types.AsyncGeneratorFunction)])
         this._names.set('AsyncGeneratorFunction', [['AsyncGenFn', 'AGFn'], (v)=>v instanceof this._types.AsyncGeneratorFunction])
 
+        this._names.set('Promise', [[], (v)=>v instanceof Promise])
+        this._names.set('Iterator', [['Iter', 'Itr', 'It'], (v)=>{
+            if (this.isNullOrUndefined(v)) { return false }
+            return 'function'===typeof v[Symbol.iterator]
+        }])
+        //this._names.set('Empty', [['Blank'], (v)=>this.isItr(v) && ('length,size'.split(',').some(n=>v[n]===0))])
+        this._names.set('Empty', [['Blank'], (v)=>{
+            if (this.isItr(v)) {
+                if ('length,size'.split(',').some(n=>v[n]===0)) { return true }
+                //if ('keys,values,entries'.split(',').some(n=>Object[n](v).length===0)) { return true }
+                return false
+            } else { throw new TypeError(`Not iterator.`) }
+        }])
+        // https://stackoverflow.com/questions/16754956/check-if-function-is-a-generator
+//        this._names.set('Generator', [['Gen'], (v)=>fn.constructor.name === 'GeneratorFunction')
+
+        this._names.set('Array', [['Ary', 'A'], (v)=>Array.isArray(v)])
+        this._names.set('Map', [[], (v)=>v instanceof Map])
+        this._names.set('Set', [[], (v)=>v instanceof Set])
+        this._names.set('WeakMap', [[], (v)=>v instanceof WeakMap])
+        this._names.set('WeakSet', [[], (v)=>v instanceof WeakSet])
+        // https://github.com/lodash/lodash/blob/master/isPlainObject.js
+        this._names.set('Object', [['Obj', 'O'], (v)=>{
+            if (!this.#isObjectLike(v) || this.#getTag(v) != '[object Object]') { return false }
+            if (Object.getPrototypeOf(v) === null) { return true }
+            let proto = v
+            while (Object.getPrototypeOf(proto) !== null) { proto = Object.getPrototypeOf(proto) }
+            return Object.getPrototypeOf(v) === proto
+        }])
+
         // https://stackoverflow.com/questions/643782/how-to-check-whether-an-object-is-a-date
         //this._names.set('Date', [['Dt','D'], (v)=>v && v.getMonth && typeof v.getMonth === 'function' && Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)])
         //this._names.set('Date', [['Dt','D'], (v)=>this.isPrimitive(v) ? false : v && v.getMonth && typeof v.getMonth === 'function' && Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v)])
         this._names.set('Date', [['Dt','D'], (v)=>this.isPrimitive(v) ? false : Boolean(v && v.getMonth && typeof v.getMonth === 'function' && Object.prototype.toString.call(v) === '[object Date]' && !isNaN(v))])
         this._names.set('RegExp', [[], (v)=>v instanceof RegExp])
         this._names.set('URL', [[], (v)=>v instanceof URL])
-        this._names.set('Map', [[], (v)=>v instanceof Map])
-        this._names.set('Set', [[], (v)=>v instanceof Set])
         this._names.set('Element', [['Elm', 'El', 'E'], (v)=>{
             try { return v instanceof HTMLElement; }
             catch(e){
@@ -101,7 +98,11 @@ class Type {
             if ('function'!==typeof fn) { throw new Error(`${fnName}が未定義です。`)}
             this.#defineMain(fnName, fn) // 正式
             for (let name of abbrs) { this.#defineAbbr(`is${name}`, fn) } // 略名
-            this.#defineMain(`${fnName}s`, (args)=>Array.isArray(args) && args.every(x=>getter(x))) // 複数形
+            // 複数形
+            const fns = (args)=>Array.isArray(args) && args.every(x=>getter(x))
+            //this.#defineMain(`${fnName}s`, (args)=>Array.isArray(args) && args.every(x=>getter(x))) // 複数形
+            this.#defineMain(`${fnName}s`, fns) // 複数形
+            for (let name of abbrs) { this.#defineAbbr(`is${name}s`, fns) } // 略名
         }
     }
     #isObjectLike(v) { return typeof v === 'object' && v !== null }
