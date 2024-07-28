@@ -71,6 +71,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 (K==='Instance' && k==='Date') || // Type.isInstance(Date: Thu Jul 18 2024 09:10:52 GMT+0900 (日本標準時))
                 (K==='Instance' && k==='RegExp') || // Type.isInstance(RegExp: /(?:)/)
                 (K==='Instance' && k==='URL') || // Type.isInstance(URL: https://a.com/)
+                (K==='Instance' && k==='Iterator') || // Type.isIterator(Map: [object Map])
+                (K==='Instance' && k==='Array') || // Type.isIterator(Map: [object Map])
+                (K==='Instance' && k==='Map') || // Type.isIterator(Map: [object Map])
+                (K==='Instance' && k==='Set') || // Type.isIterator(Set: [object Set])
                 (K==='Iterator' && k==='Map') || // Type.isIterator(Map: [object Map])
                 (K==='Iterator' && k==='Set') || // Type.isIterator(Set: [object Set])
                 (K==='Instance' && k==='Element') // Type.isInstance(Element: [object HTMLDivElement])
@@ -93,7 +97,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     a.t('object'===typeof new String('A'))
     a.t('object'===typeof {})
     a.t(Type.isString(new String('A')))
-    a.f(Type.isInstance(new String('A')))
+    a.t(Type.isInstance(new String('A')))
     a.t(Type.isIterator(new String('A')))
 
     // 個別テスト

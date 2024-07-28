@@ -42,7 +42,7 @@ class Type {
                 if (this.isCls(v)) return false // Class
                 if (this.isErrCls(v)) return false // Error Class
                 if (this.isObj(v)) return false   // Object
-                if (this.isItr(v)) return false   // Iterator
+                //if (this.isItr(v)) return false   // Iterator
                 //if ('Object'===v.constructor.name) return false   // Object
                 return this.isCls(c) ? c===v.constructor : true // cがあるときはそのクラスのインスタンスであるか確認する
             }]],
