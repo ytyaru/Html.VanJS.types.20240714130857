@@ -11,9 +11,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     const a = new Assertion()
     class C {}
-//    console.log(C.constructor.name)
-//    console.log(Type.isClass(C))
-
 
     // ざっくりパターン試験
     const datas = {
@@ -70,6 +67,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 (K==='Function' && k==='AsyncFunction') || // Type.isFunction(AsyncFunction: async()=>{})
                 (K==='Function' && k==='GeneratorFunction') || // Type.isFunction(GeneratorFunction: function*(){yield undefined;})
                 (K==='Function' && k==='AsyncGeneratorFunction') || // Type.isFunction(AsyncGeneratorFunction: async function*(){yield undefined;})
+                (K==='GeneratorFunction' && k==='AsyncGeneratorFunction') || // Type.isFunction(GeneratorFunction: function*(){yield undefined;})
                 (K==='Instance' && k==='Date') || // Type.isInstance(Date: Thu Jul 18 2024 09:10:52 GMT+0900 (日本標準時))
                 (K==='Instance' && k==='RegExp') || // Type.isInstance(RegExp: /(?:)/)
                 (K==='Instance' && k==='URL') || // Type.isInstance(URL: https://a.com/)
@@ -135,22 +133,163 @@ window.addEventListener('DOMContentLoaded', (event) => {
     console.log(Type._types.GeneratorFunction.name)
     console.log(Type.getName(Type._types.GeneratorFunction))
     console.log(Type.isGFn(Type._types.GeneratorFunction))
-    a.t('GeneratorFunction'===Type.getName(Type._types.GeneratorFunction))
-    a.t('AsyncFunction'===Type.getName(Type._types.AsyncFunction))
-    a.t('AsyncGeneratorFunction'===Type.getName(Type._types.AsyncGeneratorFunction))
+    console.log(Type.isGFn(function*(){yield 1;}))
+//    a.t('GeneratorFunction'===Type.getName(Type._types.GeneratorFunction))
+//    a.t('AsyncFunction'===Type.getName(Type._types.AsyncFunction))
+//    a.t('AsyncGeneratorFunction'===Type.getName(Type._types.AsyncGeneratorFunction))
+    console.log(Type.getName(function*(){yield 1;}))
+    a.t('GeneratorFunction'===Type.getName(function*(){yield 1;}))
+    a.t('AsyncFunction'===Type.getName(async()=>{}))
+    a.t('AsyncGeneratorFunction'===Type.getName(async function*(){yield 1;}))
 
-    a.t(Type.isFn(()=>{}))
-    a.t(Type.isSFn(()=>{}))
-    a.f(Type.isAFn(()=>{}))
-    a.f(Type.isGFn(()=>{}))
-    a.f(Type.isAGFn(()=>{}))
-    console.log((async()=>{}).name)
-    console.log((async()=>{}).constructor.name)
-    console.log((async()=>{}) instanceof Type._types.AsyncFunction)
-    a.t(Type.isAFn(async()=>{}))
-    a.t(Type.isAFn((async()=>{})))
+    ;(function() {
+        function fn() { return 1 }
+        function *gFn() { yield 2 }
+        async function aFn() { return 3 }
+        async function *aGFn() { return 4 }
+        class C {
+            constructor(v) { this.d=v; }
+            static sm() { return 1 }
+            im() { return 2 }
+            get d() { return 3 }
+            set d(v) { this._v = v }
 
-    console.log(Type.getName(new (class {})()))
+            static *sgm() { yield 4 }
+            *igm() { yield 5 }
+            static async *sagm() { yield 6 }
+            async *iagm() { yield 7 }
+            async iam() { return 8 }
+        }
+        a.t(Type.isFn(()=>{}))
+        a.t(Type.isSFn(()=>{}))
+        a.f(Type.isAFn(()=>{}))
+        a.f(Type.isGFn(()=>{}))
+        a.f(Type.isSGFn(()=>{}))
+        a.f(Type.isAGFn(()=>{}))
+        a.t(Type.isFn(fn))
+        a.t(Type.isSFn(fn))
+        a.f(Type.isAFn((fn)))
+        a.f(Type.isGFn(fn))
+        a.f(Type.isSGFn(fn))
+        a.f(Type.isAGFn(fn))
+
+        a.f(Type.isFn(C))
+        a.f(Type.isSFn(C))
+        a.f(Type.isAFn(C))
+        a.f(Type.isGFn(C))
+        a.f(Type.isSGFn(C))
+        a.f(Type.isAGFn(C))
+        a.t(Type.isFn(C.constructor))
+        a.t(Type.isSFn(C.constructor))
+        a.f(Type.isAFn(C.constructor))
+        a.f(Type.isGFn(C.constructor))
+        a.f(Type.isSGFn(C.constructor))
+        a.f(Type.isAGFn(C.constructor))
+        a.t(Type.isFn(C.sm))
+        a.t(Type.isSFn(C.sm))
+        a.f(Type.isAFn(C.sm))
+        a.f(Type.isGFn(C.sm))
+        a.f(Type.isSGFn(C.sm))
+        a.f(Type.isAGFn(C.sm))
+        a.t(Type.isFn(C.sgm))
+        a.f(Type.isSFn(C.sgm))
+        a.f(Type.isAFn(C.sgm))
+        a.t(Type.isGFn(C.sgm))
+        a.t(Type.isSGFn(C.sgm))
+        a.f(Type.isAGFn(C.sgm))
+        a.t(Type.isFn(C.sagm))
+        a.f(Type.isSFn(C.sagm))
+        a.f(Type.isAFn(C.sagm))
+        a.t(Type.isGFn(C.sagm))
+        a.f(Type.isSGFn(C.sagm))
+        a.t(Type.isAGFn(C.sagm))
+
+        const ins = new C()
+        a.f(Type.isFn(ins))
+        a.f(Type.isSFn(ins))
+        a.f(Type.isAFn(ins))
+        a.f(Type.isGFn(ins))
+        a.f(Type.isSGFn(ins))
+        a.f(Type.isAGFn(ins))
+
+        a.t(Type.isFn(ins.im))
+        a.t(Type.isSFn(ins.im))
+        a.f(Type.isAFn(ins.im))
+        a.f(Type.isGFn(ins.im))
+        a.f(Type.isSGFn(ins.im))
+        a.f(Type.isAGFn(ins.im))
+
+        a.t(Type.isFn(ins.iam))
+        a.f(Type.isSFn(ins.iam))
+        a.t(Type.isAFn(ins.iam))
+        a.f(Type.isGFn(ins.iam))
+        a.f(Type.isSGFn(ins.iam))
+        a.f(Type.isAGFn(ins.iam))
+
+        a.t(Type.isFn(ins.igm))
+        a.f(Type.isSFn(ins.igm))
+        a.f(Type.isAFn(ins.igm))
+        a.t(Type.isGFn(ins.igm))
+        a.t(Type.isSGFn(ins.igm))
+        a.f(Type.isAGFn(ins.igm))
+
+        a.t(Type.isFn(ins.iagm))
+        a.f(Type.isSFn(ins.iagm))
+        a.f(Type.isAFn(ins.iagm))
+        a.t(Type.isGFn(ins.iagm))
+        a.f(Type.isSGFn(ins.iagm))
+        a.t(Type.isAGFn(ins.iagm))
+
+        a.f(Type.isFn(ins.d))
+        a.f(Type.isSFn(ins.d))
+        a.f(Type.isAFn(ins.d))
+        a.f(Type.isGFn(ins.d))
+        a.f(Type.isSGFn(ins.d))
+        a.f(Type.isAGFn(ins.d))
+
+//        console.log((async()=>{}).name)
+//        console.log((async()=>{}).constructor.name)
+//        console.log((async()=>{}) instanceof Type._types.AsyncFunction)
+        a.t(Type.isFn(function*(){yield 1}))
+        a.f(Type.isSFn(function*(){yield 1}))
+        a.f(Type.isAFn(function*(){yield 1}))
+        a.t(Type.isGFn((function*(){yield 1})))
+        a.t(Type.isSGFn((function*(){yield 1})))
+        a.f(Type.isAGFn((function*(){yield 1})))
+        a.t(Type.isFn(gFn))
+        a.f(Type.isSFn(gFn))
+        a.f(Type.isAFn(gFn))
+        a.t(Type.isGFn((gFn)))
+        a.t(Type.isSGFn((gFn)))
+        a.f(Type.isAGFn((gFn)))
+
+        a.t(Type.isFn(async()=>{}))
+        a.f(Type.isSFn(async()=>{}))
+        a.t(Type.isAFn(async()=>{}))
+        a.f(Type.isGFn((async()=>{})))
+        a.f(Type.isSGFn((async()=>{})))
+        a.f(Type.isAGFn((async()=>{})))
+        a.t(Type.isFn(aFn))
+        a.f(Type.isSFn(aFn))
+        a.t(Type.isAFn(aFn))
+        a.f(Type.isGFn((aFn)))
+        a.f(Type.isSGFn((aFn)))
+        a.f(Type.isAGFn(aFn))
+
+        a.t(Type.isFn(async function*(){yield 1}))
+        a.f(Type.isSFn(async function*(){yield 1}))
+        a.f(Type.isAFn(async function*(){yield 1}))
+        a.t(Type.isGFn((async function*(){yield 1})))
+        a.f(Type.isSGFn((async function*(){yield 1})))
+        a.t(Type.isAGFn((async function*(){yield 1})))
+        a.t(Type.isFn(aGFn))
+        a.f(Type.isSFn(aGFn))
+        a.f(Type.isAFn(aGFn))
+        a.t(Type.isGFn((aGFn)))
+        a.f(Type.isSGFn((aGFn)))
+        a.t(Type.isAGFn((aGFn)))
+        console.log(Type.getName(new (class {})()))
+    })();
 
     const SomeClass = Type.to('class', 'SomeClass')
     a.t(Type.isClass(SomeClass))

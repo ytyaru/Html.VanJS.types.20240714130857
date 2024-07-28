@@ -5,6 +5,9 @@ class Type {
             AsyncFunction: (async()=>{}).constructor,
             GeneratorFunction: (function*(){yield undefined;}).constructor,
             AsyncGeneratorFunction: (async function*(){yield undefined;}).constructor,
+//            AsyncFunction: (async()=>{}),
+//            GeneratorFunction: (function*(){yield undefined;}),
+//            AsyncGeneratorFunction: (async function*(){yield undefined;}),
         }
         this._names = new Map([
             ['Null', [[], (v)=>null===v]],
@@ -50,9 +53,10 @@ class Type {
             //['Function', [['Func', 'Fn'], (v)=>'function'===typeof v && !v.toString().match(/^class /)]],
             ['Function', [['Func', 'Fn'], (v)=>'function'===typeof v && !v.toString().match(/^class /) && !this.isErrCls(v)]],
             ['SyncFunction', [['SyncFn', 'SFn'], (v)=>this.isFn(v) && !this.isAFn(v) && !this.isGFn(v) && !this.isAGFn(v)]],
+            //['AsyncFunction', [['AsyncFunc', 'AsyncFn', 'AFn'], (v)=>v instanceof this._types.AsyncFunction]],
             ['AsyncFunction', [['AsyncFunc', 'AsyncFn', 'AFn'], (v)=>v instanceof this._types.AsyncFunction]],
             //['AsyncFunction', [['AsyncFunc', 'AsyncFn', 'AFn'], (v)=>'AsyncFunction'===v.name]],
-            ['GeneratorFunction', [['GenFn', 'GFn'], (v)=>v instanceof this._types.GeneratorFunction]],
+            ['GeneratorFunction', [['GenFn', 'GFn'], (v)=>v instanceof this._types.GeneratorFunction || v instanceof this._types.AsyncGeneratorFunction]],
             //['GeneratorFunction', [['GenFn', 'GFn'], (v)=>'GeneratorFunction'===v.name]],
             ['SyncGeneratorFunction', [['SyncGenFn', 'SGFn'], (v)=>v instanceof this._types.GeneratorFunction && !(v instanceof this._types.AsyncGeneratorFunction)]],
             //['SyncGeneratorFunction', [['SyncGenFn', 'SGFn'], (v)=>this.GFn(v) && !this.AGFn(v)]],
@@ -137,24 +141,19 @@ class Type {
     getName(v) {
         if (undefined===v) { return 'Undefined' }
         if (null===v) { return 'Null' }
-        if ('bigint'===typeof v) { return 'BigInt' }
+        if (this.isBool(v)) { return 'Boolean' }
         if (this.isInt(v)) { return 'Integer' }
         if (this.isFloat(v)) { return 'Float' }
+        if (this.isBigInt(v)) { return 'BigInt' }
+        if (this.isSym(v)) { return 'Symbol' }
         if (this.isErrCls(v)) { return `(ErrorClass ${v.name})` }
         if (this.isErrIns(v)) { return `(ErrorInstance ${v.constructor.name})` }
         if (this.isCls(v)) { return v.name ? `(Class ${v.name})` : `(NoNameClass)` }
         if (this.isIns(v)) { return v.constructor.name ? `(Instance ${v.constructor.name})` : `(NoNameClassInstance)` }
-        //if (this.isAFn(v) || this.isGFn(v) || this.isAGFn(v)) { return v.constructor.name }
-        if (this.isAFn(v) || this.isGFn(v) || this.isAGFn(v)) { console.log('***********');return v.name }
+        if (this.isAFn(v) || this.isGFn(v) || this.isAGFn(v)) { return v.constructor.name }
+        if (this.isObj(v)) { return 'Object' }
+        // 上記のいずれかに当てはまることを期待している
         const name = typeof v
-        /*
-        if ('function'===name) {
-            if (this.isAFn(v) || this.isGFn(v) || this.isAGFn(v)) { return v.constructor.name }
-        } else if ('object'===name) {
-            if (this.isClass(v)) { return v.name }
-            else if (this.isInstance(v)) { return v.constructor.name }
-        }
-        */
         return name[0].toUpperCase() + name.slice(1)
     }
     to(type, ...values) { // boxing  value:型変換したい値, type:型名(typeof)
