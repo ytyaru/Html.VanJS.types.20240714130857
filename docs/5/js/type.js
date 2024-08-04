@@ -139,6 +139,25 @@ class Type {
 //    isEmpty(v) { return this.isItr(v) && (0===v.length || 0===v.size) }
 //    isNullOrUndefinedOrEmpty(v) { return this.isNU(v) || this.isEmpty(v) }
 //    isNUE(v) { return this.isNU(v) || this.isEmpty(v) }
+
+    // 実行可能なら引数なしで実行する。不能ならそのまま返す
+    //fnV(v) { return this.isFn(v) ? v() : v }
+    fnV(v) {
+        if (this.isGFn(v) || this.isAFn(v)) { throw new TypeError(`ジェネレータ関数や非同期関数は受け付けません。`) }
+        return this.isFn(v) ? v() : v
+    }
+    /*
+    ifel(...args) {
+        if (args.length<2) { throw TypeError(`引数は2つ以上必要です。[condFn1, retFn1, condFn2, retFn2, ..., defFn]`) }
+        const setNum = Math.floor(args.length/2);
+        for (let i=0; i<setNum*2; i+=2) {
+            const cond = !!this.fnV(args[i])
+            if (cond) { return this.fnV(args[i+1]) }
+        }
+        if (setNum*2<args.length) { return this.fnV(args[setNum*2]) }
+    }
+    */
+
     getName(v) {
         if (undefined===v) { return 'Undefined' }
         if (null===v) { return 'Null' }
@@ -153,6 +172,7 @@ class Type {
         if (this.isIns(v)) { return v.constructor.name ? `(Instance ${v.constructor.name})` : `(NoNameClassInstance)` }
         if (this.isAFn(v) || this.isGFn(v) || this.isAGFn(v)) { return v.constructor.name }
         if (this.isObj(v)) { return 'Object' }
+        try { if (Type.isStr(v.typeName)) { return v.typeName } } catch (e) {} // Proxy
         // 上記のいずれかに当てはまることを期待している
         const name = typeof v
         return name[0].toUpperCase() + name.slice(1)
@@ -311,3 +331,13 @@ class Type {
 window.Type = new Type()
 String.prototype.capitalize = function(str) { return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase() }
 })()
+// 糖衣構文 if else-if else (...) {return} を再現する
+function ifel(...args) {
+    if (args.length<2) { throw TypeError(`引数は2つ以上必要です。[condFn1, retFn1, condFn2, retFn2, ..., defFn]`) }
+    const setNum = Math.floor(args.length/2);
+    for (let i=0; i<setNum*2; i+=2) {
+        const cond = !!Type.fnV(args[i])
+        if (cond) { return Type.fnV(args[i+1]) }
+    }
+    if (setNum*2<args.length) { return Type.fnV(args[setNum*2]) }
+}

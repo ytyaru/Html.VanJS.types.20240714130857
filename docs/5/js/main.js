@@ -122,6 +122,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     a.t('Integer'===Type.getName(-1))
     a.t('BigInt'===Type.getName(BigInt(9)))
     a.t('Symbol'===Type.getName(Symbol('')))
+    console.log(Type.getName(''))
     a.t('String'===Type.getName(''))
     a.t('(NoNameClass)'===Type.getName(class {}))
     a.t('(NoNameClassInstance)'===Type.getName(new (class {})()))
@@ -366,6 +367,50 @@ window.addEventListener('DOMContentLoaded', (event) => {
 //    Type.to('class', )
 
     */
+
+
+
+
+    // 糖衣構文 ifel
+    a.e(TypeError, `引数は2つ以上必要です。[condFn1, retFn1, condFn2, retFn2, ..., defFn]`, ()=>ifel())
+    a.e(TypeError, `引数は2つ以上必要です。[condFn1, retFn1, condFn2, retFn2, ..., defFn]`, ()=>ifel(true))
+    a.t(1===ifel(true, 1))
+    a.t(undefined===ifel(false, 1))
+    a.t(2===ifel(false, 1, 2))
+    a.t(1===ifel(()=>true, 1))
+    a.t(undefined===ifel(()=>false, 1))
+    a.t(1===ifel(()=>true, 1, 2))
+    a.t(2===ifel(()=>false, 1, 2))
+    a.t(1===ifel(()=>true, ()=>1))
+    a.t(2===ifel(()=>false, ()=>1, ()=>2))
+    a.t(1===ifel(()=>true, ()=>1, ()=>2))
+    a.t(1===ifel(
+        ()=>true, ()=>1, 
+        ()=>true, ()=>2))
+    a.t(1===ifel(
+        ()=>true, ()=>1, 
+        ()=>false, ()=>2))
+    a.t(2===ifel(
+        ()=>false, ()=>1, 
+        ()=>true, ()=>2))
+    a.t(undefined===ifel(
+        ()=>false, ()=>1, 
+        ()=>false, ()=>2))
+    a.t(1===ifel(
+        ()=>true, ()=>1, 
+        ()=>false, ()=>2, 
+        ()=>3))
+    a.t(2===ifel(
+        ()=>false, ()=>1, 
+        ()=>true, ()=>2, 
+        ()=>3))
+    a.t(3===ifel(
+        ()=>false, ()=>1, 
+        ()=>false, ()=>2, 
+        ()=>3))
+
+
+
     a.fin()
 });
 window.addEventListener('beforeunload', (event) => {
