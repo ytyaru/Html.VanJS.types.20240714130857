@@ -419,7 +419,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     console.log(Type.toStr({fn:()=>true}))
     console.log(Type.toStr([1,()=>true]))
     console.log(Type.toStr(new Set([1,()=>true])))
-    a.t('{k:1}'===Type.toStr({k:1}))
+    a.t('{"k":1}'===Type.toStr({k:1}))
     a.fin()
 });
 window.addEventListener('beforeunload', (event) => {
