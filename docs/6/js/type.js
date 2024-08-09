@@ -180,7 +180,11 @@ class Type {
         const name = typeof v
         return name[0].toUpperCase() + name.slice(1)
     }
-    toStr(x) { console.log(this.getName(x), this.isIns(x, Set), this.isIns(x, Array), (x instanceof Array), (x instanceof Set), this.isCls(Array), this.isCls(Set)); return JSON.stringify(x, (k,v)=>ifel(
+    toStr(x) {
+        if (!Type.isObj(x) && !Type.isAry(x)) { x = {x:x} }
+        return JSON.stringify(x, (k,v)=>ifel(
+    //toStr(x) { return JSON.stringify(x, (k,v)=>ifel(
+    //toStr(x) { console.log(this.getName(x), this.isIns(x, Set), this.isIns(x, Array), (x instanceof Array), (x instanceof Set), this.isCls(Array), this.isCls(Set)); return JSON.stringify(x, (k,v)=>ifel(
         (this.isBool(v) || this.isInt(v) || this.isFloat(v)), v,
         this.isErrCls(v), ()=>v.constructor.name,
         this.isErrIns(v), ()=>`${v.name}(${v.message})`,
