@@ -181,7 +181,7 @@ class Type {
         return name[0].toUpperCase() + name.slice(1)
     }
     toStr(x) {
-        if (!Type.isObj(x) && !Type.isAry(x)) { x = {x:x} }
+        if (!this.isObj(x) && !this.isAry(x)) { x = {x:x} }
         return JSON.stringify(x, (k,v)=>ifel(
     //toStr(x) { return JSON.stringify(x, (k,v)=>ifel(
     //toStr(x) { console.log(this.getName(x), this.isIns(x, Set), this.isIns(x, Array), (x instanceof Array), (x instanceof Set), this.isCls(Array), this.isCls(Set)); return JSON.stringify(x, (k,v)=>ifel(
