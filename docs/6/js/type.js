@@ -261,7 +261,8 @@ class Type {
     _hasS(obj,key) { return this._hasGS(obj,key,true) }
     _hasGS(obj,key,isS) { try { return this.isFn(this._getDesc(obj,key)[(isS ? 's' : 'g')+'et']) } catch(e) {return false} }
     _getDesc(obj,key) { return Object.getOwnPropertyDescriptor(obj, key) }
-
+    getGetter(obj,key) { return obj.__lookupGetter__(key) ?? Object.getOwnPropertyDescriptor(obj, key).get }
+    getSetter(obj,key) { return obj.__lookupSetter__(key) ?? Object.getOwnPropertyDescriptor(obj, key).set }
 
     /*
     async aWait(fn, ...args) {
