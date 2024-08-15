@@ -421,7 +421,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     console.log(Type.toStr(new Set([1,()=>true])))
     a.t('{"k":1}'===Type.toStr({k:1}))
 
-
+    // Auguments: 残余引数
     ;(function(){
         class C {
             method(...args) {
@@ -443,6 +443,30 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t('this is IntStr: 0, a'===c.method(0, 'a'))
         a.t('not found.'===c.method(1.2))
     })();
+    // Auguments: augumentsオブジェクト
+    ;(function(){
+        class C {
+            method(...args) {
+                return Auguments.of(arguments).match(
+                    `int`, (...args)=>this.#methodInt(...args),
+                    `str`, (...args)=>this.#methodStr(...args),
+                    `int,str`, (...args)=>this.#methodIntStr(...args),
+                    ()=>`not found.`
+                )
+            }
+            #methodInt(i) { return `this is int: ${i}`}
+            #methodStr(s) { return `this is str: ${s}`}
+            #methodIntStr(i,s) { return `this is IntStr: ${i}, ${s}`}
+        }
+        const c = new C()
+        a.t('this is int: 0'===c.method(0))
+        a.t('this is str: 0'===c.method('0'))
+        a.t('this is str: a'===c.method('a'))
+        a.t('this is IntStr: 0, a'===c.method(0, 'a'))
+        a.t('not found.'===c.method(1.2))
+    })();
+
+
 
     a.fin()
 });
