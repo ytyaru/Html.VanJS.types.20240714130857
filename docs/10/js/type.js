@@ -234,8 +234,8 @@ class Type {
         else if (this.isIns(obj)) { return this.getStaticMethod(Object.getPrototypeOf(Object.getPrototypeOf(obj).constructor),key) }
         else { return undefined }
     }
-    getGetter(obj,key) { return obj.__lookupGetter__(key) ?? Object.getOwnPropertyDescriptor(obj, key).get }
-    getSetter(obj,key) { return obj.__lookupSetter__(key) ?? Object.getOwnPropertyDescriptor(obj, key).set }
+    getGetter(obj,key) { const d=this._getDesc(obj,key); return d && d.hasOwnProperty('get') ? d.get : obj.__lookupGetter__(key) }
+    getSetter(obj,key) { const d=this._getDesc(obj,key); return d && d.hasOwnProperty('set') ? d.set : obj.__lookupSetter__(key) }
     getField(obj,key) {
         const m = this._getDesc(obj,key).value
         if (this.isFn(m) || this.hasGS(obj,key)) { return undefined }
