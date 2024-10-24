@@ -93,6 +93,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     a.f(Type.isPrim(new String('A')))
 
     a.t(Type.isObject({}))
+    a.t(Type.isObject(Object.create({})))
+    a.f(Type.isObject(new C()))
     a.f(Type.isObject(new String('A')))
     a.t('object'===typeof new String('A'))
     a.t('object'===typeof {})
@@ -752,10 +754,124 @@ window.addEventListener('DOMContentLoaded', (event) => {
         console.log(Object.getPrototypeOf(D.constructor))
         console.log(Object.getPrototypeOf(D))
         a.t(Type.hasStaticMethod(D, 'sm'))
+    })();
+    ;(function(){
+        const obj = {a:0, fn:()=>{}}
+        Object.defineProperty(obj, 'g', {get(){return 'getter'}})
+        Object.defineProperty(obj, 's', {set(){return 'getter'}})
+        Object.defineProperty(obj, 'gs', {get(){return 'getter'},set(){}})
 
+        a.t(0===Type.getProperty(obj, 'a'))
+        a.t(0===Type.getField(obj, 'a'))
+        a.t(undefined===Type.getFn(obj, 'a'))
+        a.t(undefined===Type.getMethod(obj, 'a'))
+        a.t(undefined===Type.getStaticMethod(obj, 'a'))
+        a.t(undefined===Type.getGetter(obj, 'a'))
+        a.t(undefined===Type.getSetter(obj, 'a'))
 
+        a.t(obj.fn===Type.getProperty(obj, 'fn'))
+        a.t(undefined===Type.getField(obj, 'fn'))
+        a.t(obj.fn===Type.getFn(obj, 'fn'))
+        a.t(undefined===Type.getMethod(obj, 'fn'))
+        a.t(undefined===Type.getStaticMethod(obj, 'fn'))
+        a.t(undefined===Type.getGetter(obj, 'fn'))
+        a.t(undefined===Type.getSetter(obj, 'fn'))
+
+        a.t(0===Type.getOwnProperty(obj, 'a'))
+        console.log(Type.getOwnField(obj, 'a'))
+        a.t(0===Type.getOwnField(obj, 'a'))
+        a.t(undefined===Type.getOwnFn(obj, 'a'))
+        a.t(undefined===Type.getOwnMethod(obj, 'a'))
+        a.t(undefined===Type.getOwnStaticMethod(obj, 'a'))
+        a.t(undefined===Type.getOwnGetter(obj, 'a'))
+        a.t(undefined===Type.getOwnSetter(obj, 'a'))
+
+        console.log(Type.getOwnProperty(obj, 'fn'))
+        a.t(obj.fn===Type.getOwnProperty(obj, 'fn'))
+        a.t(undefined===Type.getOwnField(obj, 'fn'))
+        a.t(obj.fn===Type.getOwnFn(obj, 'fn'))
+        a.t(undefined===Type.getOwnMethod(obj, 'fn'))
+        a.t(undefined===Type.getOwnStaticMethod(obj, 'fn'))
+        a.t(undefined===Type.getOwnGetter(obj, 'fn'))
+        a.t(undefined===Type.getOwnSetter(obj, 'fn'))
+    })();
+    ;(function(){
+        const base = {a:0, fn:()=>{}}
+        Object.defineProperty(base, 'g', {get(){return 'getter'}})
+        Object.defineProperty(base, 's', {set(){}})
+        Object.defineProperty(base, 'gs', {get(){return 'getter'},set(){}})
+        const obj = Object.create(base)
+        console.log(obj)
+
+        a.t(0===Type.getProperty(obj, 'a'))
+        a.t(0===Type.getField(obj, 'a'))
+        a.t(undefined===Type.getFn(obj, 'a'))
+        a.t(undefined===Type.getMethod(obj, 'a'))
+        a.t(undefined===Type.getStaticMethod(obj, 'a'))
+        a.t(undefined===Type.getGetter(obj, 'a'))
+        a.t(undefined===Type.getSetter(obj, 'a'))
+
+        a.t(obj.fn===Type.getProperty(obj, 'fn'))
+        a.t(undefined===Type.getField(obj, 'fn'))
+        a.t(obj.fn===Type.getFn(obj, 'fn'))
+        console.log(obj.toString())
+        console.log(Type.isObj(obj))
+        console.log(Type.isIns(obj))
+        console.log(Type.getMethod(obj, 'fn'))
+        a.t(undefined===Type.getMethod(obj, 'fn'))
+        a.t(undefined===Type.getStaticMethod(obj, 'fn'))
+        a.t(undefined===Type.getGetter(obj, 'fn'))
+        a.t(undefined===Type.getSetter(obj, 'fn'))
+
+        // Ownには存在しない。そのprototypeが持っている。
+        a.t(undefined===Type.getOwnProperty(obj, 'a'))
+        a.t(undefined===Type.getOwnField(obj, 'a'))
+        a.t(undefined===Type.getOwnFn(obj, 'a'))
+        a.t(undefined===Type.getOwnMethod(obj, 'a'))
+        a.t(undefined===Type.getOwnStaticMethod(obj, 'a'))
+        a.t(undefined===Type.getOwnGetter(obj, 'a'))
+        a.t(undefined===Type.getOwnSetter(obj, 'a'))
+
+        console.log(Type.getOwnProperty(obj, 'fn'))
+        a.t(undefined===Type.getOwnProperty(obj, 'fn'))
+        a.t(undefined===Type.getOwnField(obj, 'fn'))
+        a.t(undefined===Type.getOwnFn(obj, 'fn'))
+        a.t(undefined===Type.getOwnMethod(obj, 'fn'))
+        a.t(undefined===Type.getOwnStaticMethod(obj, 'fn'))
+        a.t(undefined===Type.getOwnGetter(obj, 'fn'))
+        a.t(undefined===Type.getOwnSetter(obj, 'fn'))
+    })();
+    ;(function(){
+        class C {
+            constructor(){this.a=0}
+            m(){return 1}
+            get g() { return 'getter' }
+            set s(v) {}
+            get gs() { return 'getter & setter' }
+            set gs(v) {}
+            static sm(){return 2}
+        }
+        class D extends C {}
+        const ins = new D()
+
+        a.t(0===Type.getProperty(ins, 'a'))
+        a.t(0===Type.getField(ins, 'a'))
+        a.t(undefined===Type.getFn(ins, 'a'))
+        a.t(undefined===Type.getMethod(ins, 'a'))
+        a.t(undefined===Type.getStaticMethod(ins, 'a'))
+        a.t(undefined===Type.getGetter(ins, 'a'))
+        a.t(undefined===Type.getSetter(ins, 'a'))
+
+        a.t(ins.m===Type.getProperty(ins, 'm'))
+        a.t(undefined===Type.getField(ins, 'm'))
+        a.t(ins.m===Type.getFn(ins, 'm'))
+        a.t(ins.m===Type.getMethod(ins, 'm'))
+        a.t(undefined===Type.getStaticMethod(ins, 'm'))
+        a.t(undefined===Type.getGetter(ins, 'm'))
+        a.t(undefined===Type.getSetter(ins, 'm'))
 
     })();
+
 
 
     // 糖衣構文 ifel
