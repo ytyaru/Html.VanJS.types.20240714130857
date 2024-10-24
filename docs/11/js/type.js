@@ -296,6 +296,8 @@ class Type {
         else { this.getOwner(name, Object.getPrototypeOf(target)) }
     }
 
+    hasOwn(obj,key){const r=this.getOwn(obj,key); return undefined!==r || this.NOT_EXIST_FIELD!==r; }
+    hasOwnMember(obj,key){const r=this.getOwnMember(obj,key); return undefined!==r || this.NOT_EXIST_FIELD!==r; }
     hasOwnProperty(obj,key) { return Object.getOwnPropertyNames(obj).includes(key) }
     hasOwnMember(ins,key) {
         if (this.isIns(obj)) {
@@ -332,6 +334,30 @@ class Type {
     _hasOwnGS(obj,key,isS) { try { return this.isFn(this._getOwnDesc(obj,key)[(isS ? 's' : 'g')+'et']) } catch(e) {return false} }
     _getOwnDesc(obj,key) { return Object.getOwnPropertyDescriptor(obj, key) }
 
+    getOwn(obj,key) { return this[`getOwn${this.isCls(obj) || this.isIns(obj) ? 'Member' : 'Property'}`](obj,key) }
+    getOwnMember(obj,key) {
+        if (this.isIns(obj)) {
+            let isNEF = false;
+            for (let k of ['Field','Method','Getter','Setter']) {
+                const item = this[`getOwn${k}`](obj,key)
+                console.log(k, item, obj, key)
+                if ('Field'===k && this.NOT_EXIST_FIELD===item) {isNEF=true}
+                if (undefined!==item && this.NOT_EXIST_FIELD!==item) {return item}
+            }
+            if (isNEF) {return this.NOT_EXIST_FIELD}
+        }
+        else if (this.isCls(obj)) {
+            let isNEF = false;
+            for (let k of ['Field','Fn','Getter','Setter']) {
+                const item = this[`getOwn${k}`](obj,key)
+                //if (item) {return item}
+                console.log(k, item, obj, key, )
+                if ('Field'===k && this.NOT_EXIST_FIELD===item) {isNEF=true}
+                if (undefined!==item && this.NOT_EXIST_FIELD!==item) {return item}
+            }
+            if (isNEF) {return this.NOT_EXIST_FIELD}
+        }
+    }
     getOwnProperty(obj,key){ if (this.hasOwnProperty(obj,key)) {return obj[key]} }
     getOwnFn(obj,key){ if (this.hasOwnProperty(obj,key) && this.isFn(obj[key]) && !this.hasOwnGSo(obj,key)) {return obj[key]} }
     getOwnMethod(obj,key) { if (this.isIns(obj) && this.hasOwnProperty(obj,key) && this.isFn(obj[key]) && !this.hasOwnGSo(obj,key)) {return obj[key]} }
