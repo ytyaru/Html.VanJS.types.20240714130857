@@ -1,6 +1,9 @@
 (function() {
 class Type {
+    get NOT_EXIST_FIELD() {return this._NOT_EXIST_FIELD}
     constructor() {
+        this._NOT_EXIST_FIELD = Symbol('not-exist-field')
+//        Object.defineProperty(this.constructor, 'NOT_EXIST_FIELD', {get(){return Symbol('not-exist-field')}})
         this._types = {
             AsyncFunction: (async()=>{}).constructor,
             GeneratorFunction: (function*(){yield undefined;}).constructor,
@@ -179,10 +182,26 @@ class Type {
             default: throw new Error('typeは次のいずれかのみ有効です:undefined,null,object,array,boolean,number,integer,float,string,bigint,symbol,function,class')
         }
     }
+    // メタ(has/get)
+//    has(obj,key) { return this.isCls(obj) || this.isIns(obj) ? this.hasMember(obj,key) : this.hasProperty(obj,key) }
+    has(obj,key) { return this[`has${this.isCls(obj) || this.isIns(obj) ? 'Member' : 'Property'}`](obj,key) }
+    get(obj,key) { return this[`get${this.isCls(obj) || this.isIns(obj) ? 'Member' : 'Property'}`](obj,key) }
     hasProperty(obj,key) {
         if (!obj || !key) {return false}
         else if (this.hasOwnProperty(obj,key)) { return true }
         else { return this.hasProperty(Object.getPrototypeOf(obj),key) }
+    }
+    hasMember(obj,key) {
+        if (this.isIns(obj)) {
+            for (let k of ['Field','Method','Getter','Setter']) {
+                if (this[`has${k}`](obj,key)) {return true}
+            }
+        }
+        else if (this.isCls(obj)) {
+            if (this.hasField(obj,key)){return true} // class var
+            else if(this.hasFn(obj,key)){return true} // static method
+        }
+//        else { return this.hasProperty(obj,key) }
     }
     hasFn(obj,key) { return this.isFn(this._getDesc(obj,key).value) && !this.hasGS(obj,key) }
     hasMethod(obj,key) {
@@ -193,7 +212,7 @@ class Type {
     hasStaticMethod(obj,key) { return !!this.getStaticMethod(obj,key) }
     hasGetter(obj,key) { return this.isFn(obj.__lookupGetter__(key)) || this._hasG(obj,key) }
     hasSetter(obj,key) { return this.isFn(obj.__lookupSetter__(key)) || this._hasS(obj,key) }
-    hasGS(obj,key) { return this.hasGetter(obj,key) || this.hasGetter(obj,key) }
+    hasGS(obj,key) { return this.hasGetter(obj,key) || this.hasSetter(obj,key) }
     hasField(obj,key) {
         if (!obj || !key) {return false}
         else if (this.hasOwnField(obj,key)) { return true }
@@ -210,6 +229,23 @@ class Type {
         if (!obj || !key) {return undefined}
         else if (this.hasOwnProperty(obj,key)) { return obj[key] }
         else { return this.getProperty(Object.getPrototypeOf(obj),key) }
+    }
+    getMember(obj,key) {
+        if (this.isIns(obj)) {
+            for (let k of ['Field','Method','Getter','Setter']) {
+                const item = this[`get${k}`](obj,key)
+                console.log(k, item, obj, key)
+                if (undefined!==item && this.NOT_EXIST_FIELD!==item) {return item}
+            }
+        }
+        else if (this.isCls(obj)) {
+            for (let k of ['Field','Fn','Getter','Setter']) {
+                const item = this[`get${k}`](obj,key)
+                //if (item) {return item}
+                console.log(k, item, obj, key, )
+                if (undefined!==item && this.NOT_EXIST_FIELD!==item) {return item}
+            }
+        }
     }
     getFn(obj,key) {
         const m = this._getDesc(obj,key).value
@@ -240,9 +276,18 @@ class Type {
         else if (obj) { return this.getSetter(Object.getPrototypeOf(obj),key) }
     }
     getField(obj,key) {
-        const m = this._getDesc(obj,key).value
-        if (this.isFn(m) || this.hasGS(obj,key)) { return undefined }
-        else { return m }
+        if (!obj){return this.NOT_EXIST_FIELD}
+        const f = this.getOwnField(obj,key)
+        console.log(f)
+        if (this.NOT_EXIST_FIELD!==f) {return f}
+//        if (undefined!==f) { return f }
+        const P = Object.getPrototypeOf(obj)
+        console.log(P)
+        if (P) { return this.getField(P,key) }
+        return this.NOT_EXIST_FIELD
+//        const f = this._getDesc(obj,key).value ?? obj[key]
+//        if (this.isFn(f) || this.hasGS(obj,key)) { return undefined }
+//        else { return f }
     }
     getOwner(name, target) {
         if (this.isNU(target)) { return null }
@@ -252,6 +297,21 @@ class Type {
     }
 
     hasOwnProperty(obj,key) { return Object.getOwnPropertyNames(obj).includes(key) }
+    hasOwnMember(ins,key) {
+        if (this.isIns(obj)) {
+            for (let k of ['Field','Method','Getter','Setter']) {
+                const item = this[`getOwn${k}`](obj,key)
+                console.log(k, item, obj, key)
+                if (item) {return item}
+            }
+        }
+        else if (this.isCls(obj)) {
+            for (let k of ['Field','Fn','Getter','Setter']) {
+                const item = this[`getOwn${k}`](obj,key)
+                if (item) {return item}
+            }
+        }
+    }
     hasOwnFn(obj,key) { return this.isFn(this._getDesc(obj,key).value) }
     hasOwnMethod(obj,key) {
         if (!this.isIns(obj)) { return false }
@@ -287,8 +347,15 @@ class Type {
         const d=this._getDesc(obj,key)
         return d && d.hasOwnProperty('set') ? d.set : obj.__lookupSetter__(key)
     }}
-    getOwnField(obj,key) {if(this.hasOwnProperty(obj,key) && !this.isFn(obj[key]) && !this.hasOwnGSo(obj,key)){return obj[key]}}
+    //getOwnField(obj,key) {if(this.hasOwnProperty(obj,key) && !this.isFn(obj[key]) && !this.hasOwnGSo(obj,key)){return obj[key]}}
+    getOwnField(obj,key) {
+        console.log(this.hasOwnProperty(obj,key), !this.isFn(obj[key]), !this.hasOwnGSo(obj,key), obj[key])
+        if(this.hasOwnProperty(obj,key) && !this.isFn(obj[key]) && !this.hasOwnGSo(obj,key)){return obj[key]}
+        console.log('NOT_EXIST_FIELD:',this.NOT_EXIST_FIELD)
+        return this.NOT_EXIST_FIELD
+    }
 }
+//Object.defineProperty(Type.prototype, 'NOT_EXIST_FIELD', {get(){return Symbol('not-exist-field')}})
 window.Type = new Type()
 String.prototype.capitalize = function() { return this.charAt(0).toUpperCase() + this.slice(1).toLowerCase() }
 })()

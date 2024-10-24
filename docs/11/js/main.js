@@ -770,7 +770,11 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(undefined===Type.getSetter(obj, 'a'))
 
         a.t(obj.fn===Type.getProperty(obj, 'fn'))
-        a.t(undefined===Type.getField(obj, 'fn'))
+        console.log(Type.getField(obj, 'fn'))
+        console.log(Type.NOT_EXIST_FIELD)
+        console.log(Type.NOT_EXIST_FIELD===Type.getField(obj, 'fn'))
+        //a.t(undefined===Type.getField(obj, 'fn')) // Fieldは値がundefinedの場合もある。キーが未存在の場合と区別する必要あり
+        a.t(Type.NOT_EXIST_FIELD===Type.getField(obj, 'fn'))
         a.t(obj.fn===Type.getFn(obj, 'fn'))
         a.t(undefined===Type.getMethod(obj, 'fn'))
         a.t(undefined===Type.getStaticMethod(obj, 'fn'))
@@ -788,7 +792,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
         console.log(Type.getOwnProperty(obj, 'fn'))
         a.t(obj.fn===Type.getOwnProperty(obj, 'fn'))
-        a.t(undefined===Type.getOwnField(obj, 'fn'))
+        //a.t(undefined===Type.getOwnField(obj, 'fn'))
+        a.t(Type.NOT_EXIST_FIELD===Type.getOwnField(obj, 'fn'))
         a.t(obj.fn===Type.getOwnFn(obj, 'fn'))
         a.t(undefined===Type.getOwnMethod(obj, 'fn'))
         a.t(undefined===Type.getOwnStaticMethod(obj, 'fn'))
@@ -812,7 +817,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(undefined===Type.getSetter(obj, 'a'))
 
         a.t(obj.fn===Type.getProperty(obj, 'fn'))
-        a.t(undefined===Type.getField(obj, 'fn'))
+        //a.t(undefined===Type.getField(obj, 'fn'))
+        a.t(Type.NOT_EXIST_FIELD===Type.getField(obj, 'fn'))
         a.t(obj.fn===Type.getFn(obj, 'fn'))
         console.log(obj.toString())
         console.log(Type.isObj(obj))
@@ -825,7 +831,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
         // Ownには存在しない。そのprototypeが持っている。
         a.t(undefined===Type.getOwnProperty(obj, 'a'))
-        a.t(undefined===Type.getOwnField(obj, 'a'))
+        //a.t(undefined===Type.getOwnField(obj, 'a'))
+        a.t(Type.NOT_EXIST_FIELD===Type.getOwnField(obj, 'a'))
         a.t(undefined===Type.getOwnFn(obj, 'a'))
         a.t(undefined===Type.getOwnMethod(obj, 'a'))
         a.t(undefined===Type.getOwnStaticMethod(obj, 'a'))
@@ -834,7 +841,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
         console.log(Type.getOwnProperty(obj, 'fn'))
         a.t(undefined===Type.getOwnProperty(obj, 'fn'))
-        a.t(undefined===Type.getOwnField(obj, 'fn'))
+        //a.t(undefined===Type.getOwnField(obj, 'fn'))
+        a.t(Type.NOT_EXIST_FIELD===Type.getOwnField(obj, 'fn'))
         a.t(undefined===Type.getOwnFn(obj, 'fn'))
         a.t(undefined===Type.getOwnMethod(obj, 'fn'))
         a.t(undefined===Type.getOwnStaticMethod(obj, 'fn'))
@@ -854,6 +862,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
         class D extends C {}
         const ins = new D()
 
+        console.log(Type.get(ins, 'a'))
+        console.log(Type.getMember(ins, 'a'))
+        a.t(0===Type.get(ins, 'a'))
+        a.t(0===Type.getMember(ins, 'a'))
         a.t(0===Type.getProperty(ins, 'a'))
         a.t(0===Type.getField(ins, 'a'))
         a.t(undefined===Type.getFn(ins, 'a'))
@@ -863,12 +875,41 @@ window.addEventListener('DOMContentLoaded', (event) => {
         a.t(undefined===Type.getSetter(ins, 'a'))
 
         a.t(ins.m===Type.getProperty(ins, 'm'))
-        a.t(undefined===Type.getField(ins, 'm'))
+        //a.t(undefined===Type.getField(ins, 'm'))
+        a.t(Type.NOT_EXIST_FIELD===Type.getField(ins, 'm'))
         a.t(ins.m===Type.getFn(ins, 'm'))
         a.t(ins.m===Type.getMethod(ins, 'm'))
         a.t(undefined===Type.getStaticMethod(ins, 'm'))
         a.t(undefined===Type.getGetter(ins, 'm'))
         a.t(undefined===Type.getSetter(ins, 'm'))
+
+        console.log(Object.getOwnPropertyNames({a:0,fn:()=>{}}))
+        console.log(Object.getOwnPropertyNames(ins))
+//        const G = Object.getOwnPropertyDescriptor(ins, 'g')
+        //const G = Object.getOwnPropertyDescriptor(D, 'g')
+        //const G = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(D), 'g')
+        //const G = Object.getOwnPropertyDescriptor(C, 'g')
+        //const G = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(C), 'g')
+        //const G = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(ins), 'g')
+        const G = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Object.getPrototypeOf(ins)), 'g')
+        console.log(G)
+        console.log(C, D, ins)
+        console.log(Type.get(ins, 'g'))
+        a.t(G.get===Type.get(ins, 'g'))
+        //console.log(Type.getProperty(ins, 'g'))
+        //a.t(undefined===Type.getProperty(ins, 'g'))
+        //a.t(G.get===Type.getProperty(ins, 'g'))
+        a.t('getter'===Type.getProperty(ins, 'g'))
+        a.t(G.get===Type.getMember(ins, 'g'))
+        //a.t(undefined===Type.getField(ins, 'g'))
+        a.t(Type.NOT_EXIST_FIELD===Type.getField(ins, 'g'))
+        //a.t(G.get===Type.getFn(ins, 'g'))
+        a.t(undefined===Type.getFn(ins, 'g'))
+        //a.t(G.get===Type.getMethod(ins, 'g'))
+        a.t(undefined===Type.getMethod(ins, 'g'))
+        a.t(undefined===Type.getStaticMethod(ins, 'g'))
+        a.t(G.get===Type.getGetter(ins, 'g'))
+        a.t(undefined===Type.getSetter(ins, 'g'))
 
     })();
 
