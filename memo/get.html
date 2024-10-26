@@ -1,0 +1,78 @@
+<script src="../docs/lib/util/array/product.js"></script>
+<script>
+const obj = {a:0, fn:()=>{}}
+Object.defineProperty(obj, 'g', {get(){return 'getter'}})
+Object.defineProperty(obj, 's', {set(){return 'getter'}})
+Object.defineProperty(obj, 'gs', {get(){return 'getter & setter'},set(){}})
+
+const base = {a:0, fn:()=>{}}
+Object.defineProperty(base, 'g', {get(){return 'getter'}})
+Object.defineProperty(base, 's', {set(){}})
+Object.defineProperty(base, 'gs', {get(){return 'getter & setter'},set(){}})
+const sub = Object.create(base)
+
+class C {
+    F=0;
+    #pf = 1
+    static sf = 2
+    static #spf = 3
+    static sm(){return 4}
+    static #spm(){return 5}
+    constructor(){this.f=6;}//this.#pf=6;
+    m(){return 7}
+    #pm(){return 8}
+    get g() { return 'getter' }
+    set s(v) {}
+    get gs() { return 'getter & setter' }
+    set gs(v) {}
+    get #pg() { return 'private getter' }
+    set #ps(v) {}
+    get #pgs() { return 'private getter & setter' }
+    set #pgs(v) {}
+}
+class D extends C {}
+const c = new C()
+const d = new D()
+
+// getter/setter は関数の実行結果が返される。関数オブジェクトが欲しい場合もある。特にsetterはさもなくば用を成さない。
+// getterに関しては、実行結果／関数オブジェクト どちらを取得するか選択したい？　あるいは関数を返して実行させる？
+console.log(['a','fn','g','s','gs'].map(k=>obj[k]))
+console.log(['a','fn','g','s','gs'].map(k=>base[k]))
+console.log(['a','fn','g','s','gs'].map(k=>sub[k]))
+
+console.log(Object.getOwnPropertyDescriptor(obj, 'g'))
+console.log(Object.getOwnPropertyDescriptor(obj, 'g').get)
+
+console.assert(['a','fn','g','s','gs'].every(k=>k in obj))
+console.assert(['a','fn','g','s','gs'].every(k=>k in base))
+console.assert(['a','fn','g','s','gs'].every(k=>k in sub))
+console.assert(!('NOT-EXIST-KEY-NAME' in obj))
+
+//console.assert(['f','sm','a','m','g','s','gs'].every(k=>k in C))
+//console.assert(['f','sm','a','m','g','s','gs'].every(k=>k in D))
+//console.assert(['f','sm','a','m','g','s','gs'].every(k=>k in c))
+//console.assert(['f','sm','a','m','g','s','gs'].every(k=>k in d))
+
+console.log(C)
+console.log(Object.getOwnPropertyNames(C))
+console.log(Reflect.ownKeys(C))
+console.log(c)
+console.log(Object.getOwnPropertyNames(c))
+console.log(Reflect.ownKeys(c))
+
+// #privateは参照不可
+console.assert(['','#'].product(['pf','spm','pm','pg','ps','pgs']).every(k=>[c,d,C,D].every(o=>!(k in o))))
+
+// class
+console.assert(['sf','sm'].every(k=>k in C))
+console.assert(['F','f','m','g','s','gs'].every(k=>!(k in C)))
+console.assert(['sf','sm'].every(k=>k in D))
+console.assert(['pf','a','m','g','s','gs'].every(k=>!(k in D)))
+
+// instance
+console.assert(['sf','sm'].every(k=>!(k in c)))
+console.assert(['F','f','m','g','s','gs'].every(k=>k in c))
+console.assert(['sf','sm'].every(k=>!(k in d)))
+console.assert(['F','f','m','g','s','gs'].every(k=>k in d))
+
+</script>
