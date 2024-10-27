@@ -1,6 +1,15 @@
 <script src="../docs/lib/util/array/product.js"></script>
 <script>
-const obj = {a:0, fn:()=>{}}
+// https://jsprimer.net/basic/object/
+//const obj = {a:0, fn:()=>{}}
+//const obj = {a:0, fn:()=>{}, [Symbol.iterator]:()=>{yield 1}}
+const obj = {
+    a:0,
+    fn:()=>{}, 
+    [Symbol('some')]:()=>{},
+    //[Symbol.iterator]:()=>{yield 1},
+    //[@@iterator]:()=>{yield 1},
+}
 Object.defineProperty(obj, 'g', {get(){return 'getter'}})
 Object.defineProperty(obj, 's', {set(){return 'getter'}})
 Object.defineProperty(obj, 'gs', {get(){return 'getter'},set(){}})
@@ -50,6 +59,27 @@ console.log(Reflect.ownKeys(C))
 console.log(c)
 console.log(Object.getOwnPropertyNames(c))
 console.log(Reflect.ownKeys(c))
+
+console.log(Object.keys(obj))                 // ["a", "fn"]
+console.log(Object.getOwnPropertyNames(obj))  // ["a", "fn", "g", "s", "gs"]
+console.log(Object.getOwnPropertySymbols(obj))  // [Symbol('some')]
+console.log(Object.getOwnPropertyDescriptors(obj))
+console.log(Object.keys(Object.getOwnPropertyDescriptors(obj)))  // ["a", "fn", "g", "s", "gs"]
+console.log(Object.hasOwnProperty(obj, 'fn')) // false（関数はプロパティではないらしい……）
+console.log(obj.fn)
+console.log(obj['fn'])
+
+console.log(Object.keys(sub))                 // ["a", "fn"]
+console.log(Object.getOwnPropertyNames(sub))  // ["a", "fn", "g", "s", "gs"]
+console.log(Object.getOwnPropertySymbols(sub))  // [Symbol('some')]
+console.log(Object.getOwnPropertyDescriptors(sub))
+console.log(Object.keys(Object.getOwnPropertyDescriptors(sub)))  // ["a", "fn", "g", "s", "gs"]
+console.log(Object.hasOwnProperty(sub, 'fn')) // false（関数はプロパティではないらしい……）
+console.log(sub.fn)
+console.log(sub['fn'])
+console.log('fn' in sub) // in句は再帰的に検索してくれる（__proto__まで遡る）
+
+// has(obj,key){return key in obj}
 
 // #privateは参照不可
 console.assert(['','#'].product(['pf','spm','pm','pg','ps','pgs']).every(k=>[c,d,C,D].every(o=>!(k in o))))
