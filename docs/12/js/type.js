@@ -68,6 +68,7 @@ class Type {
             ['WeakMap', [[], (v)=>v instanceof WeakMap]],
             ['WeakSet', [[], (v)=>v instanceof WeakSet]],
             ['Object', [['Obj', 'O'], (v)=>{
+                if (this.isPrimitive(v)){return false}
                 // instance と区別するには constructor が Class かどうかで判断する
                 const P = Object.getPrototypeOf(v)
                 return null!==v && 'object'===typeof v && '[object Object]'===this.#getTag(v) && !(P && P.hasOwnProperty('constructor') && this.isCls(P.constructor));
