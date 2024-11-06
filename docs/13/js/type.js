@@ -37,7 +37,7 @@ class Type {
             ['ValidPrimitive', [['VPrim','VP','Val','Value'], (v)=>this.isNUN(v) ? false : this.isPrim(v)]],
             ['Reference',[['Ref'],(v)=>!this.isNUN(v) && v === Object(v)]],
 
-            ['Class', [['Cls','Constructor'], (v)=>(('function'===typeof v) && (!!v.toString().match(/^class /)))]],
+            ['Class', [['Cls'], (v)=>(('function'===typeof v) && (!!v.toString().match(/^class /)))]],
             ['Instance', [['Ins'], (v, c)=>{
                 if (this.isPrimitive(v)) return false
                 if (this.isFunction(v)) return false

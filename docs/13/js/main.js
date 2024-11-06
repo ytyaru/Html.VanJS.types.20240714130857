@@ -110,17 +110,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
     a.t(Type.isInstance(new String('A')))
     a.t(Type.isIterator(new String('A')))
 
-    // 抽象型テスト(Defined,Val,Ref)
-    a.f(Type.isDefined(undefined))
-    a.f(Type.isDefined(NaN))
+    // 抽象型テスト(Defined,Ref,Val,Primitive)
+    ;[undefined,NaN].map(v=>a.f(Type.isDefined(v)));
     ;[null,true,false,0,1,-1,Infinity,0n,'A',Symbol()].map(v=>a.t(Type.isDefined(v)));
-
-    ;[undefined,null,NaN].map(v=>a.f(Type.isVal(v)));
-    ;[true,false,0,1,-1,Infinity,0n,'A',Symbol()].map(v=>a.t(Type.isVal(v)));
 
     ;[undefined,null,NaN].map(v=>a.f(Type.isRef(v)));
     ;[true,false,0,1,-1,Infinity,0n,'A',Symbol()].map(v=>a.f(Type.isRef(v)));
     ;[new Boolean(),new Number(),new String(),new Function(),new Proxy({},{}),new Promise(()=>{})].map(v=>a.t(Type.isRef(v)));
+
+    ;[undefined,null,NaN].map(v=>a.f(Type.isVal(v)));
+    ;[true,false,0,1,-1,Infinity,0n,'A',Symbol()].map(v=>a.t(Type.isVal(v)));
+    ;[new Boolean(),new Number(),new String(),new Function(),new Proxy({},{}),new Promise(()=>{})].map(v=>a.f(Type.isVal(v)));
+
+    ;[undefined,null,NaN].map(v=>a.t(Type.isPrimitive(v)));
+    ;[true,false,0,1,-1,Infinity,0n,'A',Symbol()].map(v=>a.t(Type.isPrimitive(v)));
+    ;[new Boolean(),new Number(),new String(),new Function(),new Proxy({},{}),new Promise(()=>{})].map(v=>a.f(Type.isPrimitive(v)));
 
     // 不正型テスト(undefined,null,NaN)
     a.t(Type.isUndefined(undefined))
@@ -132,7 +136,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     ;[new Boolean(),new Number(),new String(),new Function(),new Proxy({},{}),new Promise(()=>{})].map(v=>a.f(Type.isNull(v)));
 
     a.t(Type.isNaN(NaN))
-    ;[undefined,null,NaN,Infinity,true,false,0,1,-1,0n,'A',Symbol(),new Proxy({},{})].map(v=>a.f(Type.isNaN(v)));
+    ;[undefined,null,Infinity,true,false,0,1,-1,0n,'A',Symbol(),new Proxy({},{})].map(v=>a.f(Type.isNaN(v)));
     ;[new Boolean(),new Number(),new String(),new Function(),new Proxy({},{}),new Promise(()=>{})].map(v=>a.f(Type.isNaN(v)));
 
     // 個別テスト
