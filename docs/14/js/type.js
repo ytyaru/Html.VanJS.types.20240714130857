@@ -17,7 +17,7 @@ class Type {
         this._names = new Map([
             ['Null', [[], (v)=>null===v]],
             ['Undefined', [['Und'], (v)=>undefined===v]],
-            ['Defined', [['Def'], (v)=>undefined!==v && !Number.isNaN(v)]],
+            ['Defined', [['Def','Any'], (v)=>undefined!==v && !Number.isNaN(v)]],
             ['NullOrUndefined', [['NU'], (v)=>null===v || undefined===v]],
             ['NullOrUndefinedNaN', [['NUN'], (v)=>null===v || undefined===v || Number.isNaN(v)]],
             ['Boolean', [['Bool', 'Bln', 'B'], (v)=>'boolean'===typeof v]],
